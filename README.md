@@ -214,7 +214,7 @@ ollama run llama3-zh-inst
 # 训练与精调
 
 #### 训练步骤
-[训练脚本](./scripts/training/run_clm_pt_with_peft.py)
+训练前请参考指令数据准备需要精调的数据，然后执行[训练脚本](./scripts/training/run_clm_pt_with_peft.py)。
 
 进入项目的`scripts/training`目录，运行`bash run_pt.sh`进行指令精调，默认使用单卡。运行前用户应先修改脚本并指定相关参数，脚本中的相关参数值仅供调试参考。`run_pt.sh`的内容如下：
 ```
@@ -320,7 +320,11 @@ python scripts/merge_llama3_with_chinese_lora_low_mem.py \
 * `--verbose`：显示合并过程中的详细信息（可选）
 
 #### 模型量化
-[模型量化](####Step 2: 生成量化版本模型)
+目前`llama.cpp`已支持`.safetensors`文件以及`Hugging Face`格式`.bin`转换为FP16的`GGUF`格式。
+```
+python convert-hf-to-gguf.py llama-3-chinese-8b-instruct
+./quantize ggml-model-f16.gguf ggml-model-q4_0.gguf q4_0
+```
 #### 模型部署
 [模型部署](#推理与部署)
 
