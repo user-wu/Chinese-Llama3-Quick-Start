@@ -2,11 +2,11 @@
 ## 内容导引
 | 章节                                  | 描述                                                         |
 | ------------------------------------- | ------------------------------------------------------------ |
-| [模型简介](#一、模型简介) | 简要介绍本项目相关模型的技术特点 |
-| [模型下载](#二、模型下载)        | 中文Llama-3大模型下载地址 |
-| [推理与部署](#三、推理与部署) | 介绍了如何对模型进行量化并使用个人电脑部署并体验大模型 |
-| [训练与精调](#四、训练与精调) | 介绍了如何训练和精调中文Llama-3大模型 |
-| [免责声明](#五、免责声明) | 相关免责声明 |
+| [模型简介](# 一、模型简介) | 简要介绍本项目相关模型的技术特点 |
+| [模型下载](# 二、模型下载)        | 中文Llama-3大模型下载地址 |
+| [推理与部署](# 三、推理与部署) | 介绍了如何对模型进行量化并使用个人电脑部署并体验大模型 |
+| [训练与精调](# 四、训练与精调) | 介绍了如何训练和精调中文Llama-3大模型 |
+| [免责声明](# 五、免责声明) | 相关免责声明 |
 
 # 一、模型简介
 
@@ -120,8 +120,8 @@ python convert-hf-to-gguf.py llama-3-chinese-8b-instruct
 
 #### Step 3: 加载并启动模型
 由于本项目推出的Llama-3-Chinese-Instruct使用了原版Llama-3-Instruct的指令模板，请首先将本项目的`scripts/llama_cpp/chat.sh`拷贝至`llama.cpp`的根目录。`chat.sh`文件的内容如下所示，内部嵌套了聊天模板和一些默认参数，可根据实际情况进行修改。
-* GPU推理：cuBLAS/Metal编译需要指定offload层数，在./main中指定例如-ngl 40表示offload 40层模型参数到GPU
-* （新）启用FlashAttention：命令行中添加-fa即可启用，可加速推理（因计算设备而异）
+* GPU推理：cuBLAS/Metal编译需要指定offload层数，在`./main`中指定例如`-ngl 40`表示`offload 40`层模型参数到GPU
+* （新）启用`FlashAttention`：命令行中添加`-fa`即可启用，可加速推理（因计算设备而异）
 ```
 FIRST_INSTRUCTION=$2
 SYSTEM_PROMPT="You are a helpful assistant. 你是一个乐于助人的助手。"
@@ -138,19 +138,19 @@ SYSTEM_PROMPT="You are a helpful assistant. 你是一个乐于助人的助手。
 chmod +x chat.sh
 ./chat.sh ggml-model-q4_0.gguf 你好
 ```
-在提示符 > 之后输入你的prompt，cmd/ctrl+c中断输出，多行信息以\作为行尾。如需查看帮助和参数说明，请执行./main -h命令。
+在提示符 `>` 之后输入你的`prompt`，`cmd/ctrl+c`中断输出，多行信息以\作为行尾。如需查看帮助和参数说明，请执行`./main -h`命令。
 更详细的官方说明请参考：[https://github.com/ggerganov/llama.cpp/tree/master/examples/main](https://github.com/ggerganov/llama.cpp/tree/master/examples/main)
 
 ## 3.3使用ollama部署
 [Ollama](https://ollama.com/)是一个多平台（macOS, Windows, Linux）的大模型聊天程序，能够加载GGUF格式（llama.cpp）的模型。接下来将简要介绍使用方法。其余用途请自行尝试和查阅官方手册进行了解。
 
 #### Step 1: 下载对应平台的应用程序
-进入官方页面下载对应平台的软件：https://ollama.com/download
+进入官方页面下载对应平台的软件：`https://ollama.com/download`
 * ⚠️ 请务必使用v0.1.33以上版本，否则会出现无限生成的问题。
   ![image](https://github.com/user-wu/Chinese-llama3-fastdemo/assets/67259115/491bdcc2-98e3-4aad-817c-520e667ab794)
 #### Step 2: 安装Ollama
 * macOS：下载完毕之后直接拖入“应用程序”
-* Windows preview：下载运行exe文件
+* Windows：下载运行exe文件
 * Linux：执行以下命令
 ```
 curl -fsSL https://ollama.com/install.sh | sh
@@ -207,9 +207,9 @@ success
 ```
 ollama run llama3-zh-inst
 ```
-在>>>后输入用户指令；输入/bye结束聊天。
+在`>>>`后输入用户指令；输入`/bye`结束聊天。
 
-关于ollama的其他用法，请参考官方文档：https://github.com/ollama/ollama?tab=readme-ov-file#cli-reference
+关于`ollama`的其他用法，请参考官方文档：https://github.com/ollama/ollama?tab=readme-ov-file#cli-reference
 
 # 四、训练与精调
 
@@ -320,9 +320,9 @@ python scripts/merge_llama3_with_chinese_lora_low_mem.py \
 * `--verbose`：显示合并过程中的详细信息（可选）
 
 #### 模型量化
-[模型量化](#### Step 2: 生成量化版本模型)
+[模型量化](./#### Step 2: 生成量化版本模型)
 #### 模型部署
-[模型部署](# 三、推理与部署)
+[模型部署](./# 三、推理与部署)
 
 ### 指令模板
 
