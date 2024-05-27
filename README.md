@@ -139,7 +139,7 @@ chmod +x chat.sh
 在提示符 > 之后输入你的prompt，cmd/ctrl+c中断输出，多行信息以\作为行尾。如需查看帮助和参数说明，请执行./main -h命令。
 更详细的官方说明请参考：[https://github.com/ggerganov/llama.cpp/tree/master/examples/main](https://github.com/ggerganov/llama.cpp/tree/master/examples/main)
 
-## 3.2使用ollama部署
+## 3.3使用ollama部署
 
 
 # 四、训练与精调
