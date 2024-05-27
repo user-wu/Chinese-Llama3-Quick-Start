@@ -91,7 +91,7 @@ python scripts/inference/inference_hf.py \
 以[llama.cpp](https://github.com/ggerganov/llama.cpp)工具为例，介绍模型量化并在本地部署的详细步骤。Windows则可能需要cmake等编译工具的安装。本地快速部署体验推荐使用经过指令精调的Llama-3-Chinese-Instruct模型，使用6-bit或者8-bit模型效果更佳。 运行前请确保：
 * 1.系统应有make（MacOS/Linux自带）或cmake（Windows需自行安装）编译工具
 * 2.建议使用Python 3.10以上编译和运行该工具
-### Step 1: 克隆和编译llama.cpp
+#### Step 1: 克隆和编译llama.cpp
 #### llama.cpp在2024年4月30日对Llama-3 pre-tokenizer做出重大改动，务必拉取最新代码进行编译！
 * 1.拉取最新版`llama.cpp`仓库代码
 ```
@@ -109,14 +109,14 @@ macOS用户无需额外操作，`llama.cpp`已对ARM NEON做优化，并且已�
 ```
 LLAMA_METAL=1 make
 ```
-### Step 2: 生成量化版本模型
+#### Step 2: 生成量化版本模型
 也可直接下载已量化好的GGUF模型：[下载地址](#下载地址)
 
 目前`llama.cpp`已支持`.safetensors`文件以及`Hugging Face`格式`.bin`转换为FP16的`GGUF`格式。
 $ python convert-hf-to-gguf.py llama-3-chinese-8b-instruct
 $ ./quantize ggml-model-f16.gguf ggml-model-q4_0.gguf q4_0
 
-### Step 3: 加载并启动模型
+#### Step 3: 加载并启动模型
 由于本项目推出的Llama-3-Chinese-Instruct使用了原版Llama-3-Instruct的指令模板，请首先将本项目的`scripts/llama_cpp/chat.sh`拷贝至`llama.cpp`的根目录。`chat.sh`文件的内容如下所示，内部嵌套了聊天模板和一些默认参数，可根据实际情况进行修改。
 * GPU推理：cuBLAS/Metal编译需要指定offload层数，在./main中指定例如-ngl 40表示offload 40层模型参数到GPU
 * （新）启用FlashAttention：命令行中添加-fa即可启用，可加速推理（因计算设备而异）
@@ -140,7 +140,74 @@ chmod +x chat.sh
 更详细的官方说明请参考：[https://github.com/ggerganov/llama.cpp/tree/master/examples/main](https://github.com/ggerganov/llama.cpp/tree/master/examples/main)
 
 ## 3.3使用ollama部署
+[Ollama](https://ollama.com/)是一个多平台（macOS, Windows, Linux）的大模型聊天程序，能够加载GGUF格式（llama.cpp）的模型。接下来将简要介绍使用方法。其余用途请自行尝试和查阅官方手册进行了解。
 
+#### Step 1: 下载对应平台的应用程序
+进入官方页面下载对应平台的软件：https://ollama.com/download
+* ⚠️ 请务必使用v0.1.33以上版本，否则会出现无限生成的问题。
+  ![image](https://github.com/user-wu/Chinese-llama3-fastdemo/assets/67259115/491bdcc2-98e3-4aad-817c-520e667ab794)
+#### Step 2: 安装Ollama
+* macOS：下载完毕之后直接拖入“应用程序”
+* Windows preview：下载运行exe文件
+* Linux：执行以下命令
+```
+curl -fsSL https://ollama.com/install.sh | sh
+```
+其余平台请参考：[https://github.com/ollama/ollama?tab=readme-ov-file#ollama](https://github.com/ollama/ollama?tab=readme-ov-file#ollama)
+#### Step 3：创建Modelfile文件
+在文本编辑器中编写`Modelfile`文件，其内容如下：
+```
+FROM /your-path-to-ggml/ggml-model-q8_0.gguf
+TEMPLATE """{{ if .System }}<|start_header_id|>system<|end_header_id|>
+
+{{ .System }}<|eot_id|>{{ end }}{{ if .Prompt }}<|start_header_id|>user<|end_header_id|>
+
+{{ .Prompt }}<|eot_id|>{{ end }}<|start_header_id|>assistant<|end_header_id|>
+
+{{ .Response }}<|eot_id|>"""
+SYSTEM """You are a helpful assistant. 你是一个乐于助人的助手。"""
+PARAMETER temperature 0.2
+PARAMETER num_keep 24
+PARAMETER stop <|start_header_id|>
+PARAMETER stop <|end_header_id|>
+PARAMETER stop <|eot_id|>
+```
+其中：
+
+* `FROM`字段指向GGUF文件的路径，由于是聊天交互，这里使用的是Instruct模型
+* `TEMPLATE`字段定义了Llama-3-Instruct的指令模板格式
+* `SYSTEM`字段定义了系统指令（目前设置为空）
+* `PARAMETER`字段定义了一些超参数，详细列表参见：[https://github.com/ollama/ollama/blob/main/docs/modelfile.md](https://github.com/ollama/ollama/blob/main/docs/modelfile.md)
+
+#### Step 4：创建模型实例
+命令行中运行以下命令，创建一个名为`llama3-zh-inst`（名字可自定义）的模型实例，加载`Modelfile`配置：
+```
+ollama create llama3-zh-inst -f Modelfile
+```
+创建过程输出日志如下：
+```
+transferring model data
+creating model layer
+creating template layer
+creating system layer
+creating parameters layer
+creating config layer
+using already created layer sha256:f2a44c6358e8e0a60337f8a1b31f55f457558eeefd4f344272e44b0e73a86a32
+using already created layer sha256:8ab4849b038cf0abc5b1c9b8ee1443dca6b93a045c2272180d985126eb40bf6f
+writing layer sha256:b821abf159071cfc90f0941b5ca7ef721f229cfcfadcf95b5c58d0ceb3e773c7
+writing layer sha256:dc4ec177268acc3382fc6c3a395e577bf13e9e0340dd313a75f62df95c48bc1d
+writing manifest
+success
+```
+输出`success`后，即表示完成创建。
+#### Step 5：开始聊天
+输入以下命令进入聊天程序
+```
+ollama run llama3-zh-inst
+```
+在>>>后输入用户指令；输入/bye结束聊天。
+
+关于ollama的其他用法，请参考官方文档：https://github.com/ollama/ollama?tab=readme-ov-file#cli-reference
 
 # 四、训练与精调
 
