@@ -120,7 +120,7 @@ torchrun --nnodes 1 --nproc_per_node 1 run_clm_pt_with_peft.py \
 * `--data_cache_dir`: 指定一个存放数据缓存文件的目录
 * `--use_flash_attention_2`: 启用FlashAttention-2加速训练
 * `--load_in_kbits`: 可选择参数为16/8/4，即使用fp16或8bit/4bit量化进行模型训练，默认bf16训练。
-* `--modules_to_save`：需要额外训练的模块，注意这部分是###全量精调；资源受限的情况下请设置为None（效果也会受到一些影响）
+* `--modules_to_save`：需要额外训练的模块，注意这部分是全量精调；资源受限的情况下请设置为None（效果也会受到一些影响）
 这里列出的其他训练相关超参数，尤其是学习率以及和total batch size大小相关参数仅供参考。请在实际使用时根据数据情况以及硬件条件进行配置。
 
 ### 指令模板
