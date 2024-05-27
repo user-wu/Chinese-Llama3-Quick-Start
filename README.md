@@ -140,7 +140,7 @@ chmod +x chat.sh
 在提示符 `>` 之后输入你的`prompt`，`cmd/ctrl+c`中断输出，多行信息以\作为行尾。如需查看帮助和参数说明，请执行`./main -h`命令。
 更详细的官方说明请参考：[https://github.com/ggerganov/llama.cpp/tree/master/examples/main](https://github.com/ggerganov/llama.cpp/tree/master/examples/main)
 
-## 3.3使用ollama部署
+## 3.3使用ollama部署（推荐）
 [Ollama](https://ollama.com/)是一个多平台（macOS, Windows, Linux）的大模型聊天程序，能够加载GGUF格式（llama.cpp）的模型。接下来将简要介绍使用方法。其余用途请自行尝试和查阅官方手册进行了解。
 
 #### Step 1: 下载对应平台的应用程序
