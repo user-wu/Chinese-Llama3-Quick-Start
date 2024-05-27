@@ -91,7 +91,7 @@ python scripts/inference/inference_hf.py \
 * 1.系统应有make（MacOS/Linux自带）或cmake（Windows需自行安装）编译工具
 * 2.建议使用Python 3.10以上编译和运行该工具
 #### Step 1: 克隆和编译llama.cpp
-#### llama.cpp在2024年4月30日对Llama-3 pre-tokenizer做出重大改动，务必拉取最新代码进行编译！
+* llama.cpp在2024年4月30日对Llama-3 pre-tokenizer做出重大改动，务必拉取最新代码进行编译！
 * 1.拉取最新版`llama.cpp`仓库代码
 ```
 git clone https://github.com/ggerganov/llama.cpp
