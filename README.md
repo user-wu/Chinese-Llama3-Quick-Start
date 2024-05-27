@@ -213,7 +213,8 @@ ollama run llama3-zh-inst
 # 四、训练与精调
 
 #### 训练步骤
-训练前请参考指令数据准备需要精调的数据，数据参考Alpaca数据格式[alpaca_zh_51k](https://huggingface.co/datasets/hfl/alpaca_zh_51k/resolve/main/alpaca_data_51k.json?download=true)，然后执行[训练脚本](./scripts/training/run_clm_pt_with_peft.py)。
+训练前请参考指令数据准备需要精调的数据，数据参考Alpaca数据格式[alpaca_data_51k.json
+](https://huggingface.co/datasets/hfl/alpaca_zh_51k/tree/main)，然后执行[训练脚本](./scripts/training/run_clm_pt_with_peft.py)。
 
 进入项目的`scripts/training`目录，运行`bash run_pt.sh`进行指令精调，默认使用单卡。运行前用户应先修改脚本并指定相关参数，脚本中的相关参数值仅供调试参考。`run_pt.sh`的内容如下：
 ```
