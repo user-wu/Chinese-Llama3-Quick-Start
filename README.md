@@ -60,7 +60,7 @@ python scripts/inference/inference_hf.py \
     --interactive
 ```
 
-### 使用vLLM进行推理加速
+##### 使用vLLM进行推理加速
 可以使用vLLM作为LLM后端进行推理，需要额外安装vLLM库。
 ```
 pip install vllm
