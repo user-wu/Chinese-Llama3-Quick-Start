@@ -213,7 +213,7 @@ ollama run llama3-zh-inst
 # 四、训练与精调
 
 #### 训练步骤
-训练前请参考指令数据准备需要精调的数据，然后执行[训练脚本](./scripts/training/run_clm_pt_with_peft.py)。
+训练前请参考指令数据准备需要精调的数据，数据参考Alpaca数据格式[alpaca_zh_51k](https://huggingface.co/datasets/hfl/alpaca_zh_51k/resolve/main/alpaca_data_51k.json?download=true)，然后执行[训练脚本](./scripts/training/run_clm_pt_with_peft.py)。
 
 进入项目的`scripts/training`目录，运行`bash run_pt.sh`进行指令精调，默认使用单卡。运行前用户应先修改脚本并指定相关参数，脚本中的相关参数值仅供调试参考。`run_pt.sh`的内容如下：
 ```
@@ -335,9 +335,6 @@ python scripts/merge_llama3_with_chinese_lora_low_mem.py \
 >
 > 你好！有什么可以帮助你的吗？<|eot_id|>
 
-### 指令数据
-
-以下是本项目开源的部分指令数据。详情请查看：[📚 指令数据](./data)
 
 # 五、免责声明
 本项目基于由Meta发布的Llama-3模型进行开发，供学习使用。使用过程中请严格遵守Llama-3的[开源许可协议](https://github.com/meta-llama/llama3/blob/main/LICENSE)。如果涉及使用第三方代码，请务必遵从相关的开源许可协议。模型生成的内容可能会因为计算方法、随机因素以及量化精度损失等影响其准确性，因此，本项目不对模型输出的准确性提供任何保证，也不会对任何因使用相关资源和输出结果产生的损失承担责任。如果将本项目的相关模型用于商业用途，开发者应遵守当地的法律法规，确保模型输出内容的合规性，本项目不对任何由此衍生的产品或服务承担责任。
