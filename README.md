@@ -50,10 +50,94 @@
 
 # 推理与部署
 
-| [🤗transformers](https://github.com/huggingface/transformers) | 原生transformers推理接口     |  ✅   |  ✅   |  ✅   |  ✅   |  ❌   |  ✅  | [[link]](https://github.com/ymcui/Chinese-LLaMA-Alpaca-3/wiki/inference_with_transformers_zh) |
+## 使用transformers进行推理
+我们提供了命令行方式使用原生🤗transformers进行推理。下面以加载Llama-3-Chinese-Instruct模型为例说明启动方式。
+下载完整版权重之后，按以下命令启动脚本。
+```
+python scripts/inference/inference_hf.py \
+    --base_model path_to_llama3_chinese_instruct_hf_dir \
+    --with_prompt \
+    --interactive
+```
 
-| [Ollama](https://github.com/ollama/ollama) | 本地运行大模型推理 | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | [[link]](https://github.com/ymcui/Chinese-LLaMA-Alpaca-3/wiki/ollama_zh) |
+### 使用vLLM进行推理加速
+可以使用vLLM作为LLM后端进行推理，需要额外安装vLLM库。
+```
+pip install vllm
+```
+只需在原本的命令行上添加`--use_vllm`参数:
+```
+python scripts/inference/inference_hf.py \
+    --base_model path_to_llama3_chinese_instruct_hf_dir \
+    --with_prompt \
+    --interactive \
+    --use_vllm
+```
+#### 参数说明
+* `--base_model {base_model}` ：存放HF格式的Llama-3-Chinese-Instruct模型权重和配置文件的目录。也可使用🤗Model Hub模型调用名称
+* `--tokenizer_path {tokenizer_path}`：存放对应tokenizer的目录。若不提供此参数，则其默认值与--base_model相同
+* `--with_prompt`：是否将输入与prompt模版进行合并。如果加载Llama-3-Chinese-instruct模型，请务必启用此选项！
+* `--interactive`：以交互方式启动，以便进行多次单轮问答（此处不是llama.cpp中的上下文对话）
+* `--data_file {file_name}`：非交互方式启动下，按行读取file_name中的的内容进行预测
+* `--predictions_file {file_name}`：非交互式方式下，将预测的结果以json格式写入file_name
+* `--only_cpu`：仅使用CPU进行推理
+* `--gpus {gpu_ids}`：指定使用的GPU设备编号，默认为0。如使用多张GPU，以逗号分隔，如0,1,2
+* `--load_in_8bit`或`--load_in_4bit`：使用8bit或4bit方式加载模型，降低显存占用，推荐使用--load_in_4bit
+* `--use_vllm`：使用vLLM作为LLM后端进行推理
+* `--use_flash_attention_2`: 使用Flash-Attention 2加速推理，如果不指定该参数，代码默认SDPA加速。
+该脚本仅为方便快速体验用，并未对推理速度做优化。
 
+## 使用llama.cpp量化部署
+以[llama.cpp](https://github.com/ggerganov/llama.cpp)工具为例，介绍模型量化并在本地部署的详细步骤。Windows则可能需要cmake等编译工具的安装。本地快速部署体验推荐使用经过指令精调的Llama-3-Chinese-Instruct模型，使用6-bit或者8-bit模型效果更佳。 运行前请确保：
+* 1.系统应有make（MacOS/Linux自带）或cmake（Windows需自行安装）编译工具
+* 2.建议使用Python 3.10以上编译和运行该工具
+### Step 1: 克隆和编译llama.cpp
+#### llama.cpp在2024年4月30日对Llama-3 pre-tokenizer做出重大改动，务必拉取最新代码进行编译！
+* 1.拉取最新版`llama.cpp`仓库代码
+```
+git clone https://github.com/ggerganov/llama.cpp
+```
+* 2.对`llama.cpp`项目进行编译，生成`./main（用于推理）`和`./quantize`（用于量化）二进制文件。
+```
+make
+```
+Windows/Linux用户如需启用GPU推理，则推荐与[BLAS（或cuBLAS如果有GPU）一起编译](https://github.com/ggerganov/llama.cpp#blas-build)，可以提高prompt处理速度。以下是和cuBLAS一起编译的命令，适用于NVIDIA相关GPU。参考：[llama.cpp#blas-build](https://github.com/ggerganov/llama.cpp#blas-build)
+```
+make LLAMA_CUDA=1
+```
+macOS用户无需额外操作，`llama.cpp`已对ARM NEON做优化，并且已自动启用BLAS。M系列芯片推荐使用Metal启用GPU推理，显著提升速度。只需将编译命令改为：LLAMA_METAL=1 make，参考[llama.cpp#metal-build](https://github.com/ggerganov/llama.cpp#metal-build)
+```
+LLAMA_METAL=1 make
+```
+### Step 2: 生成量化版本模型
+也可直接下载已量化好的GGUF模型：[下载地址](#下载地址)
+
+目前`llama.cpp`已支持`.safetensors`文件以及`Hugging Face`格式`.bin`转换为FP16的`GGUF`格式。
+$ python convert-hf-to-gguf.py llama-3-chinese-8b-instruct
+$ ./quantize ggml-model-f16.gguf ggml-model-q4_0.gguf q4_0
+
+### Step 3: 加载并启动模型
+由于本项目推出的Llama-3-Chinese-Instruct使用了原版Llama-3-Instruct的指令模板，请首先将本项目的`scripts/llama_cpp/chat.sh`拷贝至`llama.cpp`的根目录。`chat.sh`文件的内容如下所示，内部嵌套了聊天模板和一些默认参数，可根据实际情况进行修改。
+* GPU推理：cuBLAS/Metal编译需要指定offload层数，在./main中指定例如-ngl 40表示offload 40层模型参数到GPU
+* （新）启用FlashAttention：命令行中添加-fa即可启用，可加速推理（因计算设备而异）
+```
+FIRST_INSTRUCTION=$2
+SYSTEM_PROMPT="You are a helpful assistant. 你是一个乐于助人的助手。"
+
+./main -m $1 --color -i \
+-c 0 -t 6 --temp 0.2 --repeat_penalty 1.1 -ngl 999 \
+-r '<|eot_id|>' \
+--in-prefix '<|start_header_id|>user<|end_header_id|>\n\n' \
+--in-suffix '<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n' \
+-p "<|start_header_id|>system<|end_header_id|>\n\n$SYSTEM_PROMPT<|eot_id|><|start_header_id|>user<|end_header_id|>\n\n$FIRST_INSTRUCTION<|eot_id|><|start_header_id|>assistant<|end_header_id|>\n\n"
+```
+使用以下命令启动聊天。
+```
+chmod +x chat.sh
+./chat.sh ggml-model-q4_0.gguf 你好
+```
+在提示符 > 之后输入你的prompt，cmd/ctrl+c中断输出，多行信息以\作为行尾。如需查看帮助和参数说明，请执行./main -h命令。
+更详细的官方说明请参考：[https://github.com/ggerganov/llama.cpp/tree/master/examples/main](https://github.com/ggerganov/llama.cpp/tree/master/examples/main)
 # 训练与精调
 
 ### 训练步骤
