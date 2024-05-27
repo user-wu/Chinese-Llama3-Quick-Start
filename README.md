@@ -35,6 +35,10 @@
 
 # 推理与部署
 
+| [🤗transformers](https://github.com/huggingface/transformers) | 原生transformers推理接口     |  ✅   |  ✅   |  ✅   |  ✅   |  ❌   |  ✅  | [[link]](https://github.com/ymcui/Chinese-LLaMA-Alpaca-3/wiki/inference_with_transformers_zh) |
+
+| [Ollama](https://github.com/ollama/ollama) | 本地运行大模型推理 | ✅ | ✅ | ✅ | ❌ | ✅ | ❌ | [[link]](https://github.com/ymcui/Chinese-LLaMA-Alpaca-3/wiki/ollama_zh) |
+
 # 训练与精调
 
 # 常见问题
