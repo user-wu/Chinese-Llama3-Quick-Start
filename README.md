@@ -41,4 +41,27 @@
 
 # 训练与精调
 
-# 常见问题
+### 手动训练与精调
+
+- 使用无标注数据进行预训练：[📖预训练脚本Wiki](https://github.com/ymcui/Chinese-LLaMA-Alpaca-3/wiki/pt_scripts_zh)
+- 使用有标注数据进行指令精调：[📖指令精调脚本Wiki](https://github.com/ymcui/Chinese-LLaMA-Alpaca-3/wiki/sft_scripts_zh)
+
+### 指令模板
+
+本项目Llama-3-Chinese-Instruct沿用原版Llama-3-Instruct的指令模板。以下是一组对话示例：
+
+> <|begin_of_text|><|start_header_id|>system<|end_header_id|>
+>
+> You are a helpful assistant. 你是一个乐于助人的助手。<|eot_id|><|start_header_id|>user<|end_header_id|>
+>
+> 你好<|eot_id|><|start_header_id|>assistant<|end_header_id|>
+>
+> 你好！有什么可以帮助你的吗？<|eot_id|>
+
+### 指令数据
+
+以下是本项目开源的部分指令数据。详情请查看：[📚 指令数据](./data)
+
+# 免责声明
+本项目基于由Meta发布的Llama-3模型进行开发，供学习使用。使用过程中请严格遵守Llama-3的[开源许可协议](https://github.com/meta-llama/llama3/blob/main/LICENSE)。如果涉及使用第三方代码，请务必遵从相关的开源许可协议。模型生成的内容可能会因为计算方法、随机因素以及量化精度损失等影响其准确性，因此，本项目不对模型输出的准确性提供任何保证，也不会对任何因使用相关资源和输出结果产生的损失承担责任。如果将本项目的相关模型用于商业用途，开发者应遵守当地的法律法规，确保模型输出内容的合规性，本项目不对任何由此衍生的产品或服务承担责任。
+
