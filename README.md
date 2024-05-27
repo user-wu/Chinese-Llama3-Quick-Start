@@ -320,13 +320,9 @@ python scripts/merge_llama3_with_chinese_lora_low_mem.py \
 * `--verbose`：显示合并过程中的详细信息（可选）
 
 #### 模型量化
-目前`llama.cpp`已支持`.safetensors`文件以及`Hugging Face`格式`.bin`转换为FP16的`GGUF`格式。
-```
-python convert-hf-to-gguf.py llama-3-chinese-8b-instruct
-./quantize ggml-model-f16.gguf ggml-model-q4_0.gguf q4_0
-```
+[模型量化](#step-2-%E7%94%9F%E6%88%90%E9%87%8F%E5%8C%96%E7%89%88%E6%9C%AC%E6%A8%A1%E5%9E%8B)
 #### 模型部署
-[模型部署](#推理与部署)
+[模型部署](#%E4%B8%89%E6%8E%A8%E7%90%86%E4%B8%8E%E9%83%A8%E7%BD%B2)
 
 ### 指令模板
 
