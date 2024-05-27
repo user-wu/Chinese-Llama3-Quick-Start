@@ -113,8 +113,10 @@ LLAMA_METAL=1 make
 也可直接下载已量化好的GGUF模型：[下载地址](#下载地址)
 
 目前`llama.cpp`已支持`.safetensors`文件以及`Hugging Face`格式`.bin`转换为FP16的`GGUF`格式。
-$ python convert-hf-to-gguf.py llama-3-chinese-8b-instruct
-$ ./quantize ggml-model-f16.gguf ggml-model-q4_0.gguf q4_0
+```
+python convert-hf-to-gguf.py llama-3-chinese-8b-instruct
+./quantize ggml-model-f16.gguf ggml-model-q4_0.gguf q4_0
+```
 
 #### Step 3: 加载并启动模型
 由于本项目推出的Llama-3-Chinese-Instruct使用了原版Llama-3-Instruct的指令模板，请首先将本项目的`scripts/llama_cpp/chat.sh`拷贝至`llama.cpp`的根目录。`chat.sh`文件的内容如下所示，内部嵌套了聊天模板和一些默认参数，可根据实际情况进行修改。
@@ -211,7 +213,7 @@ ollama run llama3-zh-inst
 
 # 四、训练与精调
 
-### 训练步骤
+#### 训练步骤
 [训练脚本](./scripts/training/run_clm_pt_with_peft.py)
 
 进入项目的`scripts/training`目录，运行`bash run_pt.sh`进行指令精调，默认使用单卡。运行前用户应先修改脚本并指定相关参数，脚本中的相关参数值仅供调试参考。`run_pt.sh`的内容如下：
@@ -277,6 +279,50 @@ torchrun --nnodes 1 --nproc_per_node 1 run_clm_pt_with_peft.py \
 * `--load_in_kbits`: 可选择参数为16/8/4，即使用fp16或8bit/4bit量化进行模型训练，默认bf16训练。
 * `--modules_to_save`：需要额外训练的模块，注意这部分是全量精调；资源受限的情况下请设置为None（效果也会受到一些影响）
 这里列出的其他训练相关超参数，尤其是学习率以及和total batch size大小相关参数仅供参考。请在实际使用时根据数据情况以及硬件条件进行配置。
+
+#### 模型合并与转换
+以下介绍了手动将LoRA与初始Llama-3-8B模型合并得到完整模型的流程。
+准备工作：
+* 1.运行前确保拉取仓库最新版代码：git pull
+* 2.确保机器有足够的内存加载完整模型以进行合并模型操作
+* 3.安装依赖库（项目根目录requirements.txt）
+```
+pip install -r requirements.txt
+```
+#### Step 1: 模型准备
+准备好`LORA微调前的基模型`和`LORA微调模型`。
+相关文件列表（建议只下载safetensors格式权重）：
+```
+original/  <-- 这个文件夹不用下载，里面是pth格式的权重
+config.json
+generation_config.json
+model-00001-of-00004.safetensors
+model-00002-of-00004.safetensors
+model-00003-of-00004.safetensors
+model-00004-of-00004.safetensors
+model.safetensors.index.json
+special_tokens_map.json
+tokenizer_config.json
+tokenizer.json
+```
+#### Step 2: 合并LoRA权重，生成全量模型权重
+这一步骤会合并`LoRA`权重，生成全量模型权重（`safetensors格式`）。执行以下命令：
+```
+python scripts/merge_llama3_with_chinese_lora_low_mem.py \
+    --base_model path_to_original_llama3_dir \
+    --lora_model path_to_lora \
+    --output_dir path_to_output_dir
+```
+参数说明：
+* `--base_model`：存放基模型权重和配置文件的目录
+* `--lora_model`：LoRA解压后文件所在目录
+* `--output_dir`：指定保存全量模型权重的目录，默认为`./`
+* `--verbose`：显示合并过程中的详细信息（可选）
+
+#### 模型量化
+[模型量化](#### Step 2: 生成量化版本模型)
+#### 模型部署
+[模型部署](# 三、推理与部署)
 
 ### 指令模板
 
