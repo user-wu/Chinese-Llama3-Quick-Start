@@ -156,7 +156,7 @@ curl -fsSL https://ollama.com/install.sh | sh
 ```
 其余平台请参考：[https://github.com/ollama/ollama?tab=readme-ov-file#ollama](https://github.com/ollama/ollama?tab=readme-ov-file#ollama)
 #### Step 3：创建Modelfile文件
-在文本编辑器中编写`Modelfile`文件，其内容如下：
+在文本编辑器中编写`Modelfile`文件，其内容如下（ollama推理使用gguf模型）：
 ```
 FROM /your-path-to-ggml/ggml-model-q8_0.gguf
 TEMPLATE """{{ if .System }}<|start_header_id|>system<|end_header_id|>
