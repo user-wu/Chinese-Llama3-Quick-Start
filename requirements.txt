@@ -4,3 +4,4 @@ transformers>=4.40.0
 bitsandbytes
 datasets
 safetensors
+modelscope
